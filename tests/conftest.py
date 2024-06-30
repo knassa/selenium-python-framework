@@ -1,11 +1,12 @@
-# tests/conftest.py
+from datetime import datetime
+from pathlib import Path
+
 import pytest
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-import datetime
 from py.xml import html
-from utils.test_data import TestConfig
+from pythonProject1.utils.test_data import TestConfig
 
 
 def pytest_addoption(parser):
@@ -29,7 +30,7 @@ def browser(request):
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport(item, call,config):
     # Execute all other hooks to obtain the report object
     outcome = yield
     report = outcome.get_result()
@@ -42,6 +43,18 @@ def pytest_runtest_makereport(item, call):
             # Take a screenshot and save it
             screenshot_path = f"screenshots/{item.nodeid.replace('::', '_')}.png"
             driver.save_screenshot(screenshot_path)
+    config._metadata = {
+        'Tester': 'Kapil Nassa',
+        'Date': datetime.now().strftime("%Y-%m-%d")
+    }
+
+    today = datetime.now()
+    report_dir = Path("pytest_reports", today.strftime("%Y%m%d"))
+    report_dir.mkdir(parents=True, exist_ok=True)
+    pytest_html = report_dir / f"Pytest_Report_{'%Y%m%d%H%M'}.html"
+    config.option.htmlpath = report_dir
+    config.option.self_contained_html = True
+
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_directories():
@@ -49,11 +62,8 @@ def configure_directories():
     os.makedirs("screenshots", exist_ok=True)
 
 
-def pytest_configure(config):
-    config._metadata = {
-        'Tester': 'Kapil Nassa',
-        'Date': datetime.datetime.now().strftime("%Y-%m-%d")
-    }
+def pytest_html_report_title(report):
+    report.title = "PyTest Report"
 
 
 @pytest.hookimpl(tryfirst=True)

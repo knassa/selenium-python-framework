@@ -3,3 +3,5 @@ pytest==7.1.2
 pytest-xdist==2.5.0
 pytest-html==3.1.1
 allure-pytest==2.9.45
+py~=1.11.0
+pandas~=2.2.2
