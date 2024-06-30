@@ -28,7 +28,7 @@ def browser(request):
     driver.get(TestConfig.BASE_URL)
     driver.quit()
 
-
+# check for commit third
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call,config):
     # Execute all other hooks to obtain the report object
